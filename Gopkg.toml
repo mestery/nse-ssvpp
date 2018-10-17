@@ -24,11 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-ignored = ["github.com/ligato/networkservicemesh/pkg/*",
-           "github.com/ligato/networkservicemesh/plugins/*",
-           "github.com/ligato/cn-infra",]
-
-
 [[constraint]]
   branch = "master"
   name = "github.com/ligato/networkservicemesh"
@@ -42,12 +37,12 @@ ignored = ["github.com/ligato/networkservicemesh/pkg/*",
   version = "1.15.0"
 
 [[constraint]]
-  branch = "master"
+  version = "kubernetes-1.12.1"
   name = "k8s.io/apimachinery"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version = "8.0.0"
+  version = "9.0.0"
 
 [[constraint]]
   branch = "master"

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package nsmvpp
+package nsessvpp
 
 import (
 	"fmt"
@@ -33,7 +33,6 @@ var (
 
 // Interface lists methods available to manipulate VPPDataplane controller information
 type Interface interface {
-	GetDataplaneSocket() string
 	IsConnected() bool
 	SetRegistered()
 	SetUnRegistered()
@@ -52,7 +51,6 @@ type VPPDataplane struct {
 	apiCh  govppapi.Channel
 	sync.RWMutex
 	nsmRegistered       bool
-	dataplaneSocket     string
 	dataplaneUnregister func(vpp Interface)
 }
 
@@ -69,12 +67,6 @@ func (v *VPPDataplane) SetUnRegisterCallback(f func(vpp Interface)) {
 	v.Lock()
 	defer v.Unlock()
 	v.dataplaneUnregister = f
-}
-
-// GetDataplaneSocket returns dataplane socket location, this dataplane controller
-// will be service requests.
-func (v *VPPDataplane) GetDataplaneSocket() string {
-	return v.dataplaneSocket
 }
 
 // IsConnected returns true if VPP state is connected
@@ -186,7 +178,7 @@ func (v *VPPDataplane) reConnector() {
 
 // NEWVPPDataplane starts VPP binary, waits until it is ready and populate
 // VPPDataplane controller structure.
-func NEWVPPDataplane(dataplaneSocket string) (Interface, error) {
+func NEWVPPDataplane() (Interface, error) {
 	startTime := time.Now()
 	vppConn, vppConnCh, err := govpp.AsyncConnect(vppapiclient.NewVppAdapter(""))
 	if err != nil {
@@ -205,12 +197,11 @@ func NEWVPPDataplane(dataplaneSocket string) (Interface, error) {
 		return nil, fmt.Errorf("Failed to get VPP API channel with error:%+v", err)
 	}
 	VPPDataplaneController := &VPPDataplane{
-		conn:            vppConn,
-		connCh:          vppConnCh,
-		status:          &status,
-		apiCh:           apiCh,
-		nsmRegistered:   false,
-		dataplaneSocket: dataplaneSocket,
+		conn:          vppConn,
+		connCh:        vppConnCh,
+		status:        &status,
+		apiCh:         apiCh,
+		nsmRegistered: false,
 	}
 	// Starting VPP event monitor routine
 	go VPPDataplaneController.eventMonitor()

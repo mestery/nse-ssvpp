@@ -26,6 +26,7 @@ import (
 	"github.com/ligato/networkservicemesh/pkg/nsm/apis/netmesh"
 	"github.com/ligato/networkservicemesh/pkg/nsm/apis/nseconnect"
 	"github.com/ligato/networkservicemesh/pkg/tools"
+	"github.com/mestery/nse-ssvpp/pkg/nsessvpp"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
@@ -103,12 +104,12 @@ func main() {
 	var wg sync.WaitGroup
 
 	// Initializing VPP
-	vpp, err := nsessvpp.NEWVPPDataplane(*dataplane)
+	vpp, err := nsessvpp.NEWVPPDataplane()
 	if err != nil {
 		logrus.Errorf("Failed to start VPP with error:%+v", err)
 		os.Exit(1)
 	}
-	logrus.Infof("Registered VPP dataplane with socket %s", nsessvpp.dataplaneSocket)
+	logrus.Infof("VPP NSE created, API Channel: %s", vpp.GetAPIChannel())
 
 	k8s, err := buildClient()
 	if err != nil {
@@ -196,7 +197,7 @@ func main() {
 		SocketLocation:     connectionServerSocket,
 		LocalMechanisms: []*common.LocalMechanism{
 			{
-				Type: common.LocalMechanismType_MEMIF_INTERFACE,
+				Type: common.LocalMechanismType_MEM_INTERFACE,
 			},
 		},
 	}
